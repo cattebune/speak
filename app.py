@@ -1,3 +1,4 @@
+import json
 import time
 import threading
 
@@ -6,13 +7,8 @@ import gtts.tokenizer.symbols
 from gtts import gTTS
 import pyperclip
 import pyglet
-gtts.tokenizer.symbols.SUB_PAIRS.extend([
-     ('tbh', 'to be honest'),
-     ('wtf', 'what the fuck'),
-     ('imo', 'in my opinion'),
-     ('tbf', 'to be fair'),
-]
-)
+
+
 
 def is_url_but_not_bitly(text):
     if text.startswith("$$talk$$"):
@@ -56,6 +52,24 @@ class ClipboardWatcher(threading.Thread):
         self._stopping = True
 
 def main():
+
+    # Setup shorthand dict
+    try:
+        with open("shorthand.json") as f:
+            shorthand_dict = json.load(f)
+    except FileNotFoundError:
+        print("shorthand file is missing. Creating with defaults")
+        shorthand_dict = {
+            'tbh': 'to be honest',
+            'wtf': 'what the fuck',
+            'imo': 'in my opinion',
+            'tbf': 'to be fair',
+        }
+        with open("shorthand.json", mode='w') as f:
+            json.dump(shorthand_dict, f, indent=1)
+
+    gtts.tokenizer.symbols.SUB_PAIRS.extend(shorthand_dict)
+
     watcher = ClipboardWatcher(is_url_but_not_bitly,
                                print_to_stdout,
                                0.5)
