@@ -68,7 +68,10 @@ def main():
         with open("shorthand.json", mode='w') as f:
             json.dump(shorthand_dict, f, indent=1)
 
-    gtts.tokenizer.symbols.SUB_PAIRS.extend(shorthand_dict)
+    shorthand_set_list = []
+    for acc in shorthand_dict:
+        shorthand_set_list.append((acc, shorthand_dict[acc]))
+    gtts.tokenizer.symbols.SUB_PAIRS.extend(shorthand_set_list)
 
     watcher = ClipboardWatcher(is_url_but_not_bitly,
                                print_to_stdout,
